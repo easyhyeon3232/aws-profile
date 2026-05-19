@@ -69,5 +69,6 @@ Client
 - Subnet을 Public / Private 구조로 설계했습니다.
 - EC2는 Public Subnet에 생성하여 외부 접속이 가능하도록 구성했습니다.
 
-![img_1.png](img_1.png)
+![img_2.png](img_2.png)
 
+![img_3.png](img_3.png)
