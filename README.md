@@ -59,3 +59,71 @@ Client
 
 ![img.png](img.png)
 
+## LV 1. 네트워크 구축 및 핵심 기능 배포
+
+안전한 네트워크 환경을 구성하고, 외부에서 접속 가능한 애플리케이션을 배포했습니다.
+
+### 1) 인프라 구성
+
+- VPC를 생성하고 네트워크를 분리했습니다.
+- Subnet을 Public / Private 구조로 설계했습니다.
+- EC2는 Public Subnet에 생성하여 외부 접속이 가능하도록 구성했습니다.
+
+![img_2.png](img_2.png)
+
+![img_3.png](img_3.png)
+
+
+### 2) 팀원 API 구현
+
+팀원 정보를 저장하고 조회하는 API를 구현했습니다.
+
+#### `POST /api/members`
+
+팀원의 이름, 나이, MBTI를 입력받아 저장합니다.
+
+예시 요청:
+
+```json
+{
+  "name": "홍길동",
+  "age": 27,
+  "mbti": "INTJ"
+}
+```
+
+예시 응답:
+
+```json
+{
+  "id": 1,
+  "name": "홍길동",
+  "age": 27,
+  "mbti": "INTJ"
+}
+```
+
+#### `GET /api/members/{id}`
+
+저장된 팀원 정보를 조회합니다.
+
+예시 응답:
+
+```json
+{
+  "id": 1,
+  "name": "홍길동",
+  "age": 27,
+  "mbti": "INTJ",
+  "profileImageUrl": null
+}
+```
+
+### 3) Profile 분리
+
+환경별 설정을 분리하여 로컬에서는 H2, 운영에서는 MySQL을 사용하도록 구성했습니다.
+
+- `local`: H2 기반 개발 환경
+- `prod`: MySQL(RDS) 기반 운영 환경
+
+이를 통해 개발 환경과 운영 환경의 책임을 분리하고, 배포 시 운영 DB를 안정적으로 연결할 수 있도록 했습니다.
