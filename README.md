@@ -72,3 +72,49 @@ Client
 ![img_2.png](img_2.png)
 
 ![img_3.png](img_3.png)
+
+
+### 2) 팀원 API 구현
+
+팀원 정보를 저장하고 조회하는 API를 구현했습니다.
+
+#### `POST /api/members`
+
+팀원의 이름, 나이, MBTI를 입력받아 저장합니다.
+
+예시 요청:
+
+```json
+{
+  "name": "홍길동",
+  "age": 27,
+  "mbti": "INTJ"
+}
+```
+
+예시 응답:
+
+```json
+{
+  "id": 1,
+  "name": "홍길동",
+  "age": 27,
+  "mbti": "INTJ"
+}
+```
+
+#### `GET /api/members/{id}`
+
+저장된 팀원 정보를 조회합니다.
+
+예시 응답:
+
+```json
+{
+  "id": 1,
+  "name": "홍길동",
+  "age": 27,
+  "mbti": "INTJ",
+  "profileImageUrl": null
+}
+```
