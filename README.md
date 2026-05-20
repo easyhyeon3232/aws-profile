@@ -69,8 +69,6 @@ Client
 - Subnet을 Public / Private 구조로 설계했습니다.
 - EC2는 Public Subnet에 생성하여 외부 접속이 가능하도록 구성했습니다.
 
-![img_2.png](img_2.png)
-
 ![img_3.png](img_3.png)
 
 
@@ -127,3 +125,117 @@ Client
 - `prod`: MySQL(RDS) 기반 운영 환경
 
 이를 통해 개발 환경과 운영 환경의 책임을 분리하고, 배포 시 운영 DB를 안정적으로 연결할 수 있도록 했습니다.
+
+
+### 4) 로그 전략
+
+운영 환경 추적을 위해 다음과 같은 로그 전략을 적용했습니다.
+
+- API 요청 진입 시 `INFO` 레벨 로그 기록
+- 예외 발생 시 `ERROR` 레벨 로그 및 스택 트레이스 기록
+
+예시:
+
+```text
+[API - LOG] POST /api/members
+```
+
+### 5) Actuator 적용
+
+애플리케이션의 상태 점검을 위해 Spring Boot Actuator를 적용했습니다.
+
+- 의존성 추가: `spring-boot-starter-actuator`
+
+```gradle
+implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store:4.0.0-RC1'
+```
+
+예시 설정:
+
+```properties
+management.endpoints.web.exposure.include=health,info
+```
+
+### 6) 배포 결과
+
+EC2에 애플리케이션을 배포한 뒤, 헬스 체크 응답을 확인했습니다.
+
+#### Health Check URL
+
+```text
+http://localhost:8080/actuator/health
+```
+
+예시 응답:
+
+```json
+{"status":"UP"}
+```
+
+### 제출 자료
+
+- EC2 Public IP
+
+```text
+http://52.79.110.231:8080
+```
+
+## LV 2. DB 분리 및 보안 연결
+
+운영 환경의 데이터베이스를 애플리케이션과 분리하고, 민감한 설정값은 Parameter Store를 통해 주입받도록 구성했습니다.
+
+### 1) RDS 구축
+
+- MySQL RDS를 생성했습니다.
+- 로컬 테스트가 가능하도록 Public Subnet에 배치했습니다.
+- 운영 환경에서는 EC2 애플리케이션이 RDS에 연결되도록 구성했습니다.
+
+### 2) 보안 그룹 체이닝
+
+RDS 보안 그룹에는 직접 IP를 열지 않고, EC2 보안 그룹만 허용하도록 설정했습니다.
+
+이 방식의 장점은 다음과 같습니다.
+
+- 특정 서버만 DB에 접근 가능
+- 불필요한 외부 접근 차단
+- 운영 보안성 강화
+
+### 3) Parameter Store 적용
+
+DB 접속 정보를 코드에 작성하지 않고 Parameter Store에 저장했습니다.
+
+저장 항목 예시:
+
+- DB URL
+- DB Username
+- DB Password
+- team-name
+
+애플리케이션은 실행 시점에 해당 값을 읽어 운영 환경 설정으로 주입받습니다.
+
+### 4) `/actuator/info` 확장
+
+Parameter Store에 저장한 `team-name` 값을 `/actuator/info` 엔드포인트에서 확인할 수 있도록 구성했습니다.
+
+예시 응답:
+
+```json
+{
+  "team": {
+    "name": "example-team"
+  }
+}
+```
+
+### 제출 자료
+
+#### Actuator Info URL
+
+```text
+http://52.79.110.231:8080/actuator/info
+```
+
+#### RDS 보안 그룹 스크린샷
+
+![img_4.png](img_4.png)
+
