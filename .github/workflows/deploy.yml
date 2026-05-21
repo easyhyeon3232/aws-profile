@@ -1,0 +1,95 @@
+name: CI Pipeline
+
+# 언제 이 워크플로우를 실행할지 정의
+on:
+  # main 브랜치에 push 되면 실행
+  push:
+    branches: [main]
+  # main 브랜치 대상으로 PR이 열리거나 업데이트되면 실행
+  pull_request:
+    branches: [main]
+
+# GitHub Actions가 기본적으로 가져야 할 권한
+permissions:
+  # 저장소 코드를 checkout 하기 위한 읽기 권한
+  contents: read
+
+jobs:
+  # 하나의 작업(job) 이름
+  build-and-push:
+    # 우분투 환경에서 실행
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 저장소 코드 가져오기
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Java 17 설치
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          # Java 배포판 종류
+          distribution: 'temurin'
+
+      # 3. Gradle 캐시 사용
+      # 의존성을 매번 새로 받지 않도록 해서 빌드 속도를 높임
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # 4. gradlew 실행 권한 부여
+      # Linux 환경에서는 gradlew에 실행 권한이 없으면 빌드가 실패할 수 있음
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      # 5. 테스트 실행
+      # 과제의 CI 요구사항 중 "Build & Test"에서 Test에 해당
+      - name: Run tests
+        run: ./gradlew test
+
+      # 6. JAR 파일 빌드
+      # 과제의 CI 요구사항 중 "Build & Test"에서 Build에 해당
+      - name: Build JAR
+        run: ./gradlew bootJar
+
+      # 7. Docker Hub 로그인
+      # Docker 이미지 push 전에 로그인 필요
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          # GitHub Secrets에 저장한 Docker Hub 아이디
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          # GitHub Secrets에 저장한 Docker Hub Access Token
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 8. Docker 이미지 빌드
+      - name: Build Docker image
+        run: |
+          # 현재 커밋 SHA 앞 7자리 추출
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+
+          # SHA 태그 버전 이미지 빌드
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:$SHORT_SHA .
+
+          # latest 태그도 함께 부여
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:$SHORT_SHA ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest
+
+      # 9. Docker Hub로 이미지 푸시
+      - name: Push Docker image
+        run: |
+          # 현재 커밋 SHA 앞 7자리 추출
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+
+          # SHA 태그 푸시
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:$SHORT_SHA
+
+          # latest 태그 푸시
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest
