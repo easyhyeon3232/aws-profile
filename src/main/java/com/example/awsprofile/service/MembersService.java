@@ -1,14 +1,12 @@
 package com.example.awsprofile.service;
 
-import org.springframework.stereotype.Service;
-
 import com.example.awsprofile.dto.CreateResponseDto;
 import com.example.awsprofile.dto.GetResponseDto;
 import com.example.awsprofile.dto.createRequestDto;
 import com.example.awsprofile.entity.Member;
 import com.example.awsprofile.repository.MembersRepository;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
