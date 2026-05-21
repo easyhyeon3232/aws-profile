@@ -1,0 +1,22 @@
+spring:
+  profiles:
+    active: local
+
+  # AWS Region
+  cloud:
+    aws:
+      region:
+        static: ap-northeast-2
+      s3:
+        bucket: proflie-health-prod-fileuploads
+
+  # 파일 업로드 크기 제한
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
