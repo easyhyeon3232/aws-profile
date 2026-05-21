@@ -295,7 +295,7 @@ AWS 접근 키를 코드에 저장하지 않고, S3 접근 권한이 포함된 I
 
 ```text
 {
-  "url": "https://proflie-health-prod-fileuploads.s3.ap-northeast-2.amazonaws.com/uploads/8e9b44ed-13af-42bb-a596-9053af1a55ec_%ED%94%84%EB%A1%9C%ED%95%84.jpg?X-Amz-Security-Token=IQoJb3JpZ2luX2VjEDIaDmFwLW5vcnRoZWFzdC0yIkYwRAIgYPanfrBeM5fujSikclHVESH85OwsMge%2BKahv%2F8pPuxsCIGtLNmGNJif8CFpaWkp45%2B%2BM1wcLlkwoEn0bgH4VNXHEKtIFCPv%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNTc5NzUwODA4ODM3Igzb2f0N1YBw8G6r3W4qpgW5Pc7lPYSjbqDvJi1GvG2WyQ3MfUziuZIhVhDhnaajmjcEcWCCZKuq2SORpouzbcxym7LIEqVnWd8ojZrqfKlPUzRJgo2WXVajh73auQl3CvY0rYWHIr4LUD5ZU8Hlu5Br%2Fn%2BmByKX18LV6hmp52apU1hnYAS8k9sgSWk7BNEDJiY9J7FQ7KKCAy8uYmJwgN5bBJlxeEK0RnGubcgzzcG%2FVm1sieQEn%2FKvQ7IAJ0d4kWPI6Y8elBwtmJwrn2ypRecInjWmgV3UwzWJGb1gqU5zk85iTGrKA6ZgmgPmAIRc%2FhVW1piJK6sN1u0PL5h%2F8yQEo9hUMgUNn4l9gg%2Ff8odrsSk7iy2wqNouE%2FVzSvgk%2B1zcIj9RPd1V00OCgUWFFPhnfH8kE1ZmXHS827EEWnsKVdCDanUToXACgPph8f5%2FT6ogrbxXIbieZo3Hma9z%2BxeW2aqW3z9ACBgjjCd1D16g1T46gRqVHBxUi1tu0gqzNFzg0NxGdrjRHDgQYxEI9GsPdZMnvj1Rob9z3IqCHSIHJAymElMm0PnZiZYRsPx5wZRw8dIjr3vBHiuPMRbv%2BYTmYwaoUPViAKWs7oRgfy7EZsX5F9hFicqE%2Bqbgtsy6gRQGELhSmcOS%2B5ZHlKQIj0YoBmppz2w0M5AkYcX4nbNYuq6%2BG1PLGq4WYPOGPY5uuzymDDgVMDSSrj5cnyBrTMnlQRonv3ZI1KRU%2BHaQmCEnHxZHYRXfe8tYHNzv0bjdPw2YK%2FyWU3K5rnTyCfvq%2FBqlgdzwy7AmbAqKxz%2BfSHUxYkGRko8XYbI5Kx6FS2LsXVHPbQKm9S0GfbMEwzeBSsUTeA6I60Wll%2FsXvhraC0LhUoAfXPyXWeEFZlJFil5w3vjIEofPQ2Bo%2FYuILwj91ufZzoM7qckwl8O50AY6sgFQLBHtyJbD%2Bxk9epR%2FBoZ8QZuKFQx6fQmoBvQd6B5FADue%2Fce7peW7HvOZ3TQI8vHyDBDOZ9YHhAqKRnMwPUZ2HPoGUYPmhscUsGJoWF4V3%2BL9IB%2FnJa6A5blJto%2F%2B5pjRgdEV244O5MzyRD6MCA99%2FXgdOvfHW0okgQS65Vw36MDqvM5OsBqpeV0M2WecYFObjQzA6byFcsDcUtZ%2B6rjq%2BZ%2BlNHjDAW6mYpezgKgWGC%2Bd&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260521T015246Z&X-Amz-SignedHeaders=host&X-Amz-Credential=ASIAYN66XJUCS2KVZSHG%2F20260521%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=604800&X-Amz-Signature=ca362441d72d5250317e170448ad47f0dfe03af19955ede3807827f74be4be28"
+  "url": "https://proflie-health-prod-fileuploads.s3.ap-northeast-2.amazonaws.com/uploads/8e9b44ed-13af-42bb-a596-9053af1a55ec_%ED%94%84%EB%A1%9C%ED%95%84.jpg?X-Amz-Security-Token=IQoJb3y...KgWGC%2Bd&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260521T015246Z&X-Amz-SignedHeaders=host&X-Amz-Credential={...}st&X-Amz-Expires=604800&X-Amz-Signature=ca3624..."
 }
 ```
 
@@ -308,6 +308,154 @@ AWS 접근 키를 코드에 저장하지 않고, S3 접근 권한이 포함된 I
 #### IAM Role 방식으로 진행한 경우 대체 자료
 
 ![img_1.png](img_1.png)
+
+## LV 4. Docker & CI/CD 파이프라인 구축
+
+애플리케이션 실행 환경을 Docker 이미지로 표준화하고, GitHub Actions를 통해 Docker Hub까지 자동 배포되는 흐름을 구성했습니다.
+
+### 1) Docker 도입
+
+직접 EC2에 jar를 올려 `java -jar`로 실행하는 방식 대신, 애플리케이션을 Docker 이미지로 패키징하여 실행 환경 차이를 줄였습니다.
+
+#### Dockerfile
+
+```dockerfile
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+COPY build/libs/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
+```
+
+핵심 포인트:
+
+- Java 17 기반 컨테이너 사용
+- 빌드된 jar를 컨테이너 내부로 복사
+- 컨테이너 실행 시 `prod` 프로필로 애플리케이션 시작
+
+### 2) Docker 이미지 빌드 및 실행
+
+#### 로컬 빌드
+
+```bash
+./gradlew clean build
+```
+
+#### Docker 이미지 생성
+
+```bash
+docker build -t aws-profile .
+```
+
+#### 로컬 컨테이너 실행
+
+```bash
+docker run -d -p 8080:8080 --name aws-profile-container aws-profile
+```
+
+### 3) Docker Hub 업로드
+
+빌드한 이미지를 Docker Hub에 업로드하여 EC2에서 `docker pull`로 동일한 이미지를 가져와 실행할 수 있도록 구성했습니다.
+
+#### Docker Hub 로그인
+
+```bash
+docker login
+```
+
+#### 이미지 태그 지정
+
+```bash
+docker tag aws-profile leeji/aws-profile:latest
+```
+
+#### Docker Hub 푸시
+
+```bash
+docker push leeji/aws-profile:latest
+```
+
+### 4) GitHub Actions CI/CD
+
+`main` 브랜치에 push가 발생하면 자동으로 Gradle 빌드, Docker 이미지 생성, Docker Hub 푸시가 수행되도록 구성했습니다.
+
+#### `.github/workflows/deploy.yml`
+
+```yaml
+name: Deploy to Docker Hub
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest .
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest
+```
+
+#### 사용한 GitHub Secrets
+
+- `DOCKERHUB_USERNAME`
+- `DOCKERHUB_TOKEN`
+
+### 5) EC2에서 Docker 기반 실행
+
+EC2에서는 Docker Hub에서 이미지를 pull 한 뒤 컨테이너로 실행하는 방식으로 배포를 진행합니다.
+
+#### 이미지 pull
+
+```bash
+docker pull leeji/aws-profile:latest
+```
+
+#### 기존 컨테이너 정리
+
+```bash
+docker stop aws-profile-container
+docker rm aws-profile-container
+```
+
+#### 새 컨테이너 실행
+
+```bash
+docker run -d -p 8080:8080 --name aws-profile-container leeji/aws-profile:latest
+```
+
+### 6) 기대 효과
+
+- 실행 환경 일관성 확보
+- 수동 배포 과정 단순화
+- GitHub push 기반 자동 배포 흐름 확보
+- EC2에서 `docker pull`만으로 새 버전 반영 가능
 
 
 ## 5. API 요약
