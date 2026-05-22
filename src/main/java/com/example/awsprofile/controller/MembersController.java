@@ -45,4 +45,9 @@ public class MembersController {
         URL url = s3Service.getDownloadUrl(id);
         return ResponseEntity.ok(new FileDownloadUrlResponseDto(url.toString()));
     }
+
+    @GetMapping("/deploy-check")
+    public String deployCheck() {
+        return "deploy-check-v2";
+    }
 }
