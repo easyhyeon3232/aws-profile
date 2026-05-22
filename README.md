@@ -381,6 +381,12 @@ docker push [DockerHub_Name]/aws-profile:latest
 
 #### `.github/workflows/deploy.yml`
 
+### 제출 자료
+#### Github Actions 성공 이미지
+![img_2.png](img_2.png)
+
+#### EC2 터미널 이미지
+![img_5.png](img_5.png)
 
 ## 5. API 요약
 
