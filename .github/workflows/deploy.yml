@@ -92,4 +92,4 @@ jobs:
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest
             sudo docker rm -f aws-profile-container || true
             sudo docker run -d -p 8080:8080 --name aws-profile-container ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest
-            sudo docker ps{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest
+            sudo docker ps
