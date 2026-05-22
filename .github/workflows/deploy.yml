@@ -71,25 +71,25 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # 8. Docker 이미지 빌드
+      # EC2가 arm64 이므로 플랫폼을 맞춰서 빌드
       - name: Build Docker image
         run: |
-          # 현재 커밋 SHA 앞 7자리 추출
-          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
-
-          # SHA 태그 버전 이미지 빌드
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:$SHORT_SHA .
-
-          # latest 태그도 함께 부여
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:$SHORT_SHA ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest
+          docker build --platform linux/arm64 -t ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest .
 
       # 9. Docker Hub로 이미지 푸시
       - name: Push Docker image
         run: |
-          # 현재 커밋 SHA 앞 7자리 추출
-          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
-
-          # SHA 태그 푸시
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:$SHORT_SHA
-
-          # latest 태그 푸시
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest
+
+      # 10. EC2에 SSH 접속해서 자동 배포
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest
+            sudo docker rm -f aws-profile-container || true
+            sudo docker run -d -p 8080:8080 --name aws-profile-container ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest
+            sudo docker ps{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest

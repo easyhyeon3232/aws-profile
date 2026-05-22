@@ -48,6 +48,6 @@ public class MembersController {
 
     @GetMapping("/deploy-check")
     public String deployCheck() {
-        return "deploy-check-v2";
+        return "deploy-check-v3";
     }
 }
