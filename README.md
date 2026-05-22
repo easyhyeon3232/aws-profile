@@ -360,19 +360,19 @@ docker run -d -p 8080:8080 --name aws-profile-container aws-profile
 #### Docker Hub 로그인
 
 ```bash
-docker login
+docker login -u [Docker_name]
 ```
 
 #### 이미지 태그 지정
 
 ```bash
-docker tag aws-profile leeji/aws-profile:latest
+docker tag [로컬이미지명(aws-profile)] [DockerHub이름]/[이미지명:태크(aws-profile:latest)]
 ```
 
 #### Docker Hub 푸시
 
 ```bash
-docker push leeji/aws-profile:latest
+docker push [DockerHub_Name]/aws-profile:latest
 ```
 
 ### 4) GitHub Actions CI/CD
@@ -380,82 +380,6 @@ docker push leeji/aws-profile:latest
 `main` 브랜치에 push가 발생하면 자동으로 Gradle 빌드, Docker 이미지 생성, Docker Hub 푸시가 수행되도록 구성했습니다.
 
 #### `.github/workflows/deploy.yml`
-
-```yaml
-name: Deploy to Docker Hub
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-
-      - name: Build with Gradle
-        run: ./gradlew clean build
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest .
-
-      - name: Push Docker image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/aws-profile:latest
-```
-
-#### 사용한 GitHub Secrets
-
-- `DOCKERHUB_USERNAME`
-- `DOCKERHUB_TOKEN`
-
-### 5) EC2에서 Docker 기반 실행
-
-EC2에서는 Docker Hub에서 이미지를 pull 한 뒤 컨테이너로 실행하는 방식으로 배포를 진행합니다.
-
-#### 이미지 pull
-
-```bash
-docker pull leeji/aws-profile:latest
-```
-
-#### 기존 컨테이너 정리
-
-```bash
-docker stop aws-profile-container
-docker rm aws-profile-container
-```
-
-#### 새 컨테이너 실행
-
-```bash
-docker run -d -p 8080:8080 --name aws-profile-container leeji/aws-profile:latest
-```
-
-### 6) 기대 효과
-
-- 실행 환경 일관성 확보
-- 수동 배포 과정 단순화
-- GitHub push 기반 자동 배포 흐름 확보
-- EC2에서 `docker pull`만으로 새 버전 반영 가능
 
 
 ## 5. API 요약
